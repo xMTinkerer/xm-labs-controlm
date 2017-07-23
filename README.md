@@ -1,5 +1,5 @@
 # BMC Control-M integration for xMatters
-This is an update to the BMC Control-M (Workload Automation) integration for xMatters.  The [original integration](https://support.xmatters.com/hc/en-us/articles/202025245?_ga=2.38456676.659900434.1499075783-1836047778.1485785168) is known as controlm20, this is known as controlm25.  This is a complete integration.
+This is an update to the BMC Control-M (Workload Automation) integration for xMatters.  The [original integration](https://support.xmatters.com/hc/en-us/articles/202025245) is known as controlm20, this is known as controlm25.  This is a complete integration.
 * Tested on Control-M 8 (Please update in if this works on Control-M 9)
 * Now updated to use REST
 * Now tolerant of authenticated proxy server
@@ -7,22 +7,22 @@ This is an update to the BMC Control-M (Workload Automation) integration for xMa
 * This integration is UBER closed loop! That is to say responding with Rerun, ForceOK, Logs or Output will take actual actions in Control-M, Logs and Output notifying the responding user with the result.
 
 # Pre-Requisites
-* Control-M v8   (not tested on v9 yet)
+* Control-M v8
 * BMC CONTROL-M/EM API
-* The latest xMatters Integration Agent
+* The latest [xMatters Integration Agent](https://support.xmatters.com/hc/en-us/articles/201463419) 
 * xMatters on Demand
 
 # Files
 * [BMCControlMIntegration.zip](BMCControlMIntegration.zip) - Communication Plan to be loaded into xMatters On Demand.  (DoTo: This still needs the agent failure form)
-* [controlm25](controlm25) - The integration service to be placed in 'integrationservices' on the xMatters Integration Agent.
+* [Integration Service/controlm25](Integration%20Service/controlm25) - The integration service to be placed in 'integrationservices' on the xMatters Integration Agent.
 
 
 # How it works
 Control-M   <----->   Integration Agent Service   <----->   xMatters On Demand
 
 1. The integration is triggered by Control-M in 1 of two ways. Either:
-   * A shout action is configured in Control-M for a job to execute the Controlm-APClient.bat/.sh script on a job abend, over run, under run. In this case a second action can be configured to execute Controlm-APClient-Del.bat/.sh in the event of a clear.  This is the classic method.
-   * The Control-M EM is configured to run Controlm-APClientFromSysProperty.bat/sh for all events that arrive in the EM, this is configured with Control-M system properties.
+   * A shout action is configured in Control-M for a job to execute the `Controlm-APClient.bat` or `Controlm-APClient.sh` script on a job abend, over run, under run. In this case a second action can be configured to execute `Controlm-APClient-Del.bat` or `Controlm-APClient-Del.sh` in the event of a clear.  This is the classic method.
+   * The Control-M EM is configured to run `Controlm-APClientFromSysProperty.bat` or `Controlm-APClientFromSysProperty.sh` for all events that arrive in the EM, this is configured with Control-M system properties.
 2. The scripts process the trigger into a APClient call to the integration on the xMatters Integration Agent passing the job Order ID.
 3. The integration uses the Control-M API to query Control-M for extended information about the job referenced by that Order ID.
 4. The integration uses either a message passed to it by the shout, or if non passed or the system property method used the current status of the job, to look up the URL of the form (or inbound IB) to invoke in xMatters.
@@ -44,10 +44,10 @@ There are 3 stages to configuring this integration. Before you can configure Con
 4. Note the Web Service URLs for each of the forms in the Communication Plan
 
 ## Integration Setup
-This assumes you have already installed and configured an xMatters Integration Agent. The install location of the agent is referred to here as $IA_HOME.
+This assumes you have already installed and configured an xMatters Integration Agent. The install location of the agent is referred to here as `$IAHOME`.
 
 1. Place controlm25 in `$IAHOME/integrationservices/`
-2. Edit `$IA_HOME/conf/deduplicator-filter.xml` and insert this filter:
+2. Edit `$IAHOME/conf/deduplicator-filter.xml` and insert this filter:
 ```xml
 <!-- Filter to prevent duplicate events injecting more often than once every 5 seconds -->
 <filter name="controlm">
@@ -58,13 +58,13 @@ This assumes you have already installed and configured an xMatters Integration A
   <window_size>1</window_size>
 </filter>
 ```
-3. Edit `$IA_HOME/conf/IAConfig.xml` and insert this service definition inside `<service-configs dir="../integrationservices">` (towards the bottom of the file):
+3. Edit `$IAHOME/conf/IAConfig.xml` and insert this service definition inside `<service-configs dir="../integrationservices">` (towards the bottom of the file):
 ```xml
 <path>controlm25/controlm.xml</path>
 ```
 4. Place the control-m api configuration Files in `$IAHOME/integrationservices/controlm25/`
 5. Edit `$IAHOME/integrationservices/controlm25/controlm-config.js`
-6. Edit Controlm-APClient.sh or Controlm-APClient.bat, Controlm-APClient-Del.sh or Controlm-APClient-Del.bat, Controlm-APClientFromSysProperty.sh or Controlm-APClientFromSysProperty.bat
+6. Edit `Controlm-APClient.sh` or `Controlm-APClient.bat`, `Controlm-APClient-Del.sh` or `Controlm-APClient-Del.bat`, `Controlm-APClientFromSysProperty.sh` or `Controlm-APClientFromSysProperty.bat`
 7. Update passwords, Control-M password, xmatters rest password, proxy server password if used
 8. Restart the integration agent
 
